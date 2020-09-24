@@ -33,7 +33,7 @@ class Books extends Component{
 
         }
         else {
-            axios.post('http://54.165.178.5:3302/addReview', data)
+            axios.post('http://54.165.178.5:3303/addReview', data)
                 .then(res => {
                     console.log(comment);
                     console.log(res.data);
@@ -49,7 +49,7 @@ class Books extends Component{
     }
     ViewReview=(title, author)=>{
         axios
-            .get("http://54.165.178.5:3302/viewReview", {
+            .get("http://54.165.178.5:3303/viewReview", {
                 params: {
                     Title:title
                 }
@@ -66,7 +66,7 @@ class Books extends Component{
 
 
     componentDidMount(){
-        axios.get("http://54.165.178.5:3302/getbook")
+        axios.get("http://54.165.178.5:3303/getbook")
             .then(res=>{
 
 
