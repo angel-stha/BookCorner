@@ -265,35 +265,55 @@ app.get("/ipinged",function(req,res){
         });
     });
 });
-app.post("/signup",function(req,res){
-    mysqlConnection.connect(function() {
-        var insertuser= "INSERT INTO `bookcorner`.`users`(`name`,`password`) VALUES('"+req.body.name+"','"+req.body.pass+"')";
-        mysqlConnection.query(insertuser,function(err,add_user,fields){
-            if(!err){
-                console.log(add_user);
-            }
-        })
-    })
-    mysqlConnection.query("SELECT * FROM bookcorner.users where name = '" + req.body.name + "'", (err, rows, fields) => {
-        if (rows && rows.length > 0){
-            var token = jwt.sign({name:rows[0].name}, "secret...shh");
-            console.log(token)
-            if(req.body.pass === rows[0].password){
-                res.status(200).json({
-                    name: rows[0].name,
-                    token :token
-                })
-                console.log(rows[0])
-
+app.post("/addbook", function(req, res) {
+    console.log(req.body.Title);
+    var  alreadythere = ("SELECT * FROM `bookcorner`.`book` where `bookname` = '" + req.body.Title + "' AND `author` = '" + req.body.Author + "'");
+    console.log(alreadythere)
+    mysqlConnection.query(alreadythere, function (err, result) {
+            if (result.length>0) {
+                res.send("Book Already in the Stack please review there")
             }
             else{
-                res.json({error:2})
+                mysqlConnection.connect(function () {
+
+                        var sql = "INSERT INTO `bookcorner`.`book` (`bookname`, `author`) VALUES ('" + req.body.Title + "','" + req.body.Author + "')";
+                        mysqlConnection.query(sql, function (err, result) {
+                            if (err) throw err;
+                            else console.log("1 book inserted");
+                        });
+                    }
+                )
             }
+
         }
-        else{
-            res.json({error:1})
+    )
+})
+app.post("/signup",function(req,res){
+    mysqlConnection.connect(function() {
+
+    var  alreadythere = ("SELECT * FROM `bookcorner`.`users` where `name` = '" + req.body.name + "' AND `password` = '" + req.body.pass + "'");
+    console.log(alreadythere)
+    mysqlConnection.query(alreadythere, function (err, result) {
+        if (result.length > 0) {
+            res.send("User registered already")
+        } else {
+            mysqlConnection.connect(function () {
+
+                    var insertuser = "INSERT INTO `bookcorner`.`users`(`name`,`password`) VALUES('" + req.body.name + "','" + req.body.pass + "')";
+                    mysqlConnection.query(insertuser, function (err, add_user, fields) {
+                        if (!err) {
+                            console.log(add_user);
+                            res.send("User added")
+                        }
+                    })
+                }
+            )
         }
-    });
+    })
+
+    }
+    )
+
 })
 const port = 3302;
 app.listen(port,()=>console.log(`Listening to the port ${port}`))

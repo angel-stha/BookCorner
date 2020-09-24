@@ -16,26 +16,8 @@ function App() {
     var user = localStorage.getItem("usertype")
     var token = localStorage.getItem("token")
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-    if (user === "student") {
-        return (
-            <Router>
-                <div>
 
-                    <Signup/>
-                    <Switch>
-                        <Route path='/home' component={Home}/>
-                        <Route path='/login' component={Login}/>
-                        <Route path='/book' component={Books}/>
-                        <Route path='/addbook' component={Form}/>
-                        <Route path='/my-profile' component={MyProfile}/>
-                        <Route path='/user-profile' component={UserProfile}/>
-                    </Switch>
-
-                </div>
-            </Router>
-        )
-    }
-        else if (user === "loggedin") {
+         if (user === "loggedin") {
             return (
                 <Router>
                     <div>
