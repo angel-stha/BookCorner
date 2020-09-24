@@ -41,7 +41,7 @@ function App() {
     else {
             return (
                 <div className="s">
-                    <Signup/>
+                    <Login/>
                 </div>
             )
         }
