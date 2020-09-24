@@ -145,7 +145,7 @@ class MyProfile extends Component{
 
                 <br/>
                 <br/>
-                <NavLink to='/change-password'>Change Password</NavLink>
+               
                 <br/>
                 <br/>
                 <button className="button5" onClick={this.Logout}>Logout</button>
