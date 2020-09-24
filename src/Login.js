@@ -20,7 +20,7 @@ class Login extends Component {
             cpass: this.state.cpass,
         };
         if(this.state.pass==this.state.cpass) {
-            axios.post('http://54.165.178.5:3302/signup', data)
+            axios.post('http://54.165.178.5:3303/signup', data)
                 .then(res => {
                     console.log(res.data);
                     if (res.data.name == "User registered already") {
@@ -47,7 +47,7 @@ class Login extends Component {
             pass: this.state.pass,
         };
 
-        axios.post('http://54.165.178.5:3302/login', data)
+        axios.post('http://54.165.178.5:3303/login', data)
             .then(res => {
                 console.log(res.data);
                 if (res.data.name == this.state.name) {
