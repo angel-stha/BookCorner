@@ -14,33 +14,24 @@ class UserProfile extends Component{
         };
 
     }
-    Ping=(title, author,comment,date)=>{
+    Ping=(whom)=>{
 
         var data={
-            Review:comment,
-            Title:title,
-            Author:author,
-            Date:date,
+            To:whom,
         }
-        if (comment=" "){
-            alert("Empty review!! not valid")
-            window.location.reload();
-        }
-        else {
-            axios.post('http://localhost:3302/addReview', data)
+            axios.post('http://localhost:3302/addPing', data)
                 .then(res => {
-                    console.log(comment);
                     console.log(res.data);
-                    if (res.data == 'Comment Added') {
-                        alert('Review added on' + ' ' + 'book' + ' ' + title);
-                        window.location.reload();
+                    if (res.data == 'Pinged') {
+                        alert('You pinged' + ' ' + whom);
+                        this.props.history.push('/home');
                     }
                 })
                 .catch((error) => {
                     console.log("Error");
                 });
         }
-    }
+
 
 
     componentDidMount(){
@@ -57,7 +48,6 @@ class UserProfile extends Component{
         console.log(this.props.history.location);
 
     }
-    onChange = date => this.setState({ date })
     render(){
 
         return(
@@ -75,7 +65,7 @@ class UserProfile extends Component{
                             <div className="search" >
                                 <div>{item.name}</div>
                                 <div>
-                                <button onClick={() => this.Ping(item.name,)}>
+                                <button onClick={() => this.Ping(item.name)}>
                                         Ping</button></div>
 
 

@@ -29,93 +29,96 @@ mysqlConnection.connect((err)=>{
     else
         console.log('Connection Failed'+JSON.stringify(err,undefined,2));
 });
-// app.use((req, res, next) => {
-//         mysqlConnection.query("SELECT * FROM users where name = '" + req.body.name + "'", (err, rows, fields) => {
-//             if (err) throw err;
-//             if (rows && rows.length > 0) {
-//                 req.user = rows[0];
-//                 console.log('vhiya')
-//                 console.log(req.user)
-//
-//             }
-//         })
-//     }
-// )
+app.use((req, res, next) => {
+        try{
+		const token = req.headers.authorization.split(" ")[1]
+		console.log(token)
+		jwt.verify(token, "secret...shh", function(err, payload) {
+            console.log(payload)
+            if (payload) {
+                mysqlConnection.query("SELECT * FROM users where name = '" + payload.name + "'", (err, rows, fields) => {
+                    if (err) throw err;
+                    if (rows && rows.length > 0) {
+                        req.user = rows[0];
+                        req.user.name=rows[0].name;
+                        console.log('authenticated')
+                        console.log(req.user)
+                        next();
+                    }
+                });
+            }
+        })}
+				catch(e){
+                    next();
+                }
+    }
+)
 app.get('/',(req,res)=> {
     res.json("OK")
 })
-app.use((req,res,next)=> {
-
-    mysqlConnection.query("SELECT * FROM users where name = '" + req.body.name + "'", (err, rows, fields) => {
-        if (err) throw err;
-        if (rows && rows.length > 0) {
-            req.user = rows[0];
-            console.log('vhiya')
-            console.log(req.user)
-            next();
-        }
-    })
-});
 app.post("/addbook", function(req, res) {
     console.log(req.body.Title);
-    mysqlConnection.query("SELECT * FROM bookcorner.book where bookname = '" + req.body.Title + "' AND author = '" + req.body.Author + "'", (err, rows, fields) => {
-        if (err) throw err;
-        if (rows && rows.length > 0) {
-            if (req.body.pass === rows[0].password) {
-                console.log(rows[0])
-            } else {
+   var  alreadythere = ("SELECT * FROM `bookcorner`.`book` where `bookname` = '" + req.body.Title + "' AND `author` = '" + req.body.Author + "'");
+    console.log(alreadythere)
+    mysqlConnection.query(alreadythere, function (err, result) {
+            if (result.length>0) {
                 res.send("Book Already in the Stack please review there")
             }
-        } else {
-            mysqlConnection.connect(function () {
+            else{
+                mysqlConnection.connect(function () {
 
-                    var sql = "INSERT INTO `bookcorner`.`book` (`bookname`, `author`) VALUES ('" + req.body.Title + "','" + req.body.Author + "')";
-                    mysqlConnection.query(sql, function (err, result) {
-                        if (err) throw err;
-                        else console.log("1 book inserted");
-                    });
+                                var sql = "INSERT INTO `bookcorner`.`book` (`bookname`, `author`) VALUES ('" + req.body.Title + "','" + req.body.Author + "')";
+                                mysqlConnection.query(sql, function (err, result) {
+                                    if (err) throw err;
+                                    else console.log("1 book inserted");
+                                });
+                            }
+                        )
                 }
-            )
+
         }
-        ;
-
-
-    })
+    )
 })
+        //                     else {
+        //     mysqlConnection.connect(function () {
+        //
+        //             var sql = "INSERT INTO `bookcorner`.`book` (`bookname`, `author`) VALUES ('" + req.body.Title + "','" + req.body.Author + "')";
+        //             mysqlConnection.query(sql, function (err, result) {
+        //                 if (err) throw err;
+        //                 else console.log("1 book inserted");
+        //             });
+        //         }
+        //     )
+        // }
+        // ;
+
+
+
 app.post("/login", function(req, res){
     console.log(req.body.name)
     mysqlConnection.query("SELECT * FROM bookcorner.users where name = '" + req.body.name + "'", (err, rows, fields) => {
         if (rows && rows.length > 0){
+            var token = jwt.sign({name:rows[0].name}, "secret...shh");
+            console.log(token)
             if(req.body.pass === rows[0].password){
                 res.status(200).json({
                     name: rows[0].name,
+                    token :token
                 })
-
+                console.log(rows[0])
 
             }
             else{
-                res.json(err)
+                res.json({error:2})
             }
         }
         else{
-            mysqlConnection.connect(function () {
-
-                    var sql = "INSERT INTO `bookcorner`.`users` (`name`, `password`) VALUES ('"+ req.body.name+ "','" + req.body.password + "')";
-                    mysqlConnection.query(sql, function(err, result) {
-                        if (err) throw err;
-                        else {
-                            console.log("Record inserted");
-                            res.status(200).json({
-                                // email:rows[0].email,
-                                name: rows[0].name,
-                            })
-                    };
-                }
-            )}
-            )};
-    })
-
+            res.json({error:1})
+        }
+    });
 })
+
+
 app.get("/getbook",function(req,res){
     mysqlConnection.connect(function() {
         var dataquery =  "SELECT * FROM `bookcorner`.`book`";
@@ -131,7 +134,7 @@ app.post("/addReview",function(req,res){
     console.log(req.body.Title);
     console.log(req.body.Author);
     mysqlConnection.connect(function() {
-        var AddReviewQuery= "INSERT INTO `bookcorner`.`reviewbook`(`bookname`,`review`,`byuser`,`date`,`author`) VALUES('"+req.body.Title+"','"+req.body.Review+"','Angel','"+req.body.Date+"','"+req.body.Author+"')";
+        var AddReviewQuery= "INSERT INTO `bookcorner`.`reviewbook`(`bookname`,`review`,`byuser`,`date`,`author`) VALUES('"+req.body.Title+"','"+req.body.Review+"','"+req.user.name+"','"+req.body.Date+"','"+req.body.Author+"')";
         mysqlConnection.query(AddReviewQuery,function(err,add_comment,fields){
             if(!err){
                 res.send('Comment Added');
@@ -157,18 +160,139 @@ app.get("/viewReview", function(req, res) {
 });
 app.post("/getmydata", function(req, res){
     console.log("ok")
-    console.log(req.user)
+    res.send(req.user.name)
 
 })
 app.get("/getusers",function(req,res){
-    mysqlConnection.connect(function() {
+
         var query =  "SELECT * FROM `bookcorner`.`users`";
         mysqlConnection.query(query, function(err, results, fields) {
+            if (!err)
+                console.log(results);
+               res.send(results);
+        });
+
+});
+app.get("/getrevieweddata",function(req,res){
+    mysqlConnection.connect(function() {
+        var dataquery =  "SELECT * FROM `bookcorner`.`reviewbook` WHERE `byuser`='" + req.user.name +"'";
+        console.log(dataquery);
+        mysqlConnection.query(dataquery, function(err, results, fields) {
             if (!err)
                 console.log(results);
             res.send(results);
         });
     });
 });
+app.post("/DeleteReview",function(req,res){
+    mysqlConnection.connect(function() {
+        var deletequery =  "DELETE FROM `bookcorner`.`reviewbook` WHERE `byuser`='" + req.user.name +"' AND `bookname` ='" + req.body.Title +"' AND `review` ='" + req.body.Review +"'";
+        console.log(deletequery)
+        mysqlConnection.query(deletequery, function(err, results, fields) {
+            if (!err)
+                console.log(results[0]);
+                res.send("Review Deleted");
+
+        });
+    });
+});
+app.post("/EditReview",function(req,res){
+    mysqlConnection.connect(function() {
+        var editquery =  "UPDATE `bookcorner`.`reviewbook` SET `review` = '"+req.body.NewReview+"' ,`date` = '"+req.body.date+"' WHERE `byuser`='" + req.user.name +"' AND `bookname` ='" + req.body.Title +"' AND `review` ='" + req.body.Review +"'";
+        console.log(editquery)
+        mysqlConnection.query(editquery, function(err, results, fields) {
+            if (!err)
+                console.log(results);
+            console.log("Review Edited");
+                res.send("Review Edited");
+
+        });
+    });
+});
+app.post("/addPing",function(req,res){
+    mysqlConnection.connect(function() {
+        var ping =  "INSERT INTO `bookcorner`.`ping`(`pingto`,`pingfrom`) VALUES('"+req.body.To+"','"+req.user.name+"')";
+        console.log(ping)
+        mysqlConnection.query(ping, function(err, results, fields) {
+            if (!err)
+                console.log(results);
+                 console.log("Review Edited");
+                 res.send("Pinged");
+
+        });
+    });
+});
+
+app.get("/searchbooks", function(req, res) {
+    var id = req.param("search");
+    console.log(id);
+    mysqlConnection.connect(function() {
+            var hs =
+                "SELECT * FROM `bookcorner`.`book` WHERE bookname like '" +
+                id +
+                "%' or author like  '" +
+                id +
+                "%'";
+            console.log(hs)
+            mysqlConnection.query(hs, (err, rows, fields) => {
+                if (!err)
+                    res.json(rows);
+                    console.log(rows);
+            });
+        }
+    );
+});
+app.get("/pingedme",function(req,res){
+    mysqlConnection.connect(function() {
+        var pingquery =  "SELECT * FROM `bookcorner`.`ping` WHERE `pingto`='" + req.user.name +"'";
+        console.log(pingquery);
+        mysqlConnection.query(pingquery, function(err, results, fields) {
+            if (!err)
+                console.log(results);
+            res.send(results);
+        });
+    });
+});
+app.get("/ipinged",function(req,res){
+    mysqlConnection.connect(function() {
+        var pingquery =  "SELECT * FROM `bookcorner`.`ping` WHERE `pingfrom`='" + req.user.name +"'";
+        console.log(pingquery);
+        mysqlConnection.query(pingquery, function(err, results, fields) {
+            if (!err)
+                console.log(results);
+            res.send(results);
+        });
+    });
+});
+app.post("/signup",function(req,res){
+    mysqlConnection.connect(function() {
+        var insertuser= "INSERT INTO `bookcorner`.`users`(`name`,`password`) VALUES('"+req.body.name+"','"+req.body.pass+"')";
+        mysqlConnection.query(insertuser,function(err,add_user,fields){
+            if(!err){
+                console.log(add_user);
+            }
+        })
+    })
+    mysqlConnection.query("SELECT * FROM bookcorner.users where name = '" + req.body.name + "'", (err, rows, fields) => {
+        if (rows && rows.length > 0){
+            var token = jwt.sign({name:rows[0].name}, "secret...shh");
+            console.log(token)
+            if(req.body.pass === rows[0].password){
+                res.status(200).json({
+                    name: rows[0].name,
+                    token :token
+                })
+                console.log(rows[0])
+
+            }
+            else{
+                res.json({error:2})
+            }
+        }
+        else{
+            res.json({error:1})
+        }
+    });
+})
 const port = 3302;
 app.listen(port,()=>console.log(`Listening to the port ${port}`))

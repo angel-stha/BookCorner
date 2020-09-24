@@ -2,7 +2,7 @@ import React,{Component} from 'react';
 import {NavLink} from 'react-router-dom';
 import axios from 'axios';
 import Input from './component/input/input';
-import './Homepage.css'
+import './MyProfile.css'
 import { withRouter } from "react-router-dom";
 
 class MyProfile extends Component{
@@ -12,11 +12,53 @@ class MyProfile extends Component{
 
 
             items: [],
-            Issued: [],
-            name :''
+            Reviewed: [],
+            name :'',
+            NewReview:'',
+            date:new Date(),
+            Ipinged:[]
         };
 
     }
+    DeleteReview=(title,review,date)=>{
+        var data= {
+            Review: review,
+            Title: title,
+            Date: date,
+        }
+            axios.post('http://localhost:3302/DeleteReview', data)
+                .then(res => {
+                    if (res.data == 'Review Deleted') {
+                        alert('Review deleted on' + ' '  + title);
+                         this.props.history.push('/book');
+                    }
+                })
+                .catch((error) => {
+                    console.log("Error");
+                });
+        }
+
+    EditReview=(title, review,newreview,date)=>{
+    var data= {
+        Review: review,
+        Title: title,
+        NewReview: newreview,
+        date: date,
+    }
+         axios
+            .post("http://localhost:3302/EditReview", data)
+
+            .then(res => {
+                if (res.data == 'Review Edited')
+                    this.props.history.push('/book');
+
+
+            })
+             .catch((error) => {
+                 console.log("Error");
+             });
+            }
+
 
 
     Logout=(e)=>{
@@ -33,48 +75,98 @@ class MyProfile extends Component{
                 this.setState({items: res.data});
                 console.log(this.state.items);
             })
-    }
+        axios.get("http://localhost:3302/getrevieweddata")
 
+            .then(res=>{
+                console.log(res.data);
+                this.setState({Reviewed:res.data});
+
+            })
+
+    axios.get("http://localhost:3302/ipinged")
+
+         .then(res=>{
+               console.log(res.data);
+               this.setState({Ipinged:res.data});
+
+})
+}
+
+
+    onChange = date => this.setState({ date })
 
     render(){
 
         return(
             <div className="an">
 
-                <div className="name"> Name:&nbsp;&nbsp;{ this.props.username}</div>
+                <div className="name"> Name:&nbsp;&nbsp;{ this.state.items}</div>
                 <br/>
                 <br/>
                 <div className="searchhead search" >
                     <div>Title</div>
-                    <div>Author</div>
-                    <div>Comments</div>
+                    <div> Your Comments</div>
+                    <div>Date</div>
+                    <div>Delete</div>
+                    <div>Modify</div>
 
                 </div>
-                {this.state.Issued.map((item, index) => {
+                {this.state.Reviewed.map((item, index) => {
                     console.log(item);
                         return (
                             <div className="search" >
-                                <div>{item.ISBN}</div>
-                                <div>{item.Title}</div>
-                                <div>{item.Barcode}</div>
-                                <div>{item.Issuedby}</div>
+                                <div>{item.bookname}</div>
+                                <div>{item.review}</div>
+                                <div>{item.date}</div>
+                                <div>
+                                    <button onClick={() => this.DeleteReview(item.bookname, item.review,item.date)}>
+                                        Delete Review</button>
+                                </div>
+                                <div>
+                                        <Input
+                                            inputSize="inputSmall"
+                                            type="text"
+                                            placeholder='Edit Review'
+                                            value={this.state.NewReview}
+                                            changed={e => this.setState({ NewReview: e.target.value })}
+                                        />
+                                        &nbsp; &nbsp;&nbsp;
+
+                                    <button onClick={() => this.EditReview(item.bookname, item.review,this.state.NewReview,this.state.date)}>
+                                        Edit</button>
+
+                                </div>
 
                             </div>
                         )
                     }
+                )}
 
-                )
 
-                }
                 <br/>
                 <br/>
                 <NavLink to='/change-password'>Change Password</NavLink>
                 <br/>
                 <br/>
                 <button className="button5" onClick={this.Logout}>Logout</button>
+                <div className="left">
+                    {this.state.Ipinged.map((item, index) => {
+                            console.log(item);
+                            return (
+                                <div className="search" >
+                                    <div>You pinged {item.pingto} :D.</div>
 
+
+
+
+                                </div>
+                            )
+                        }
+                    )}
+                </div>
 
             </div>
+
 
 
 

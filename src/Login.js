@@ -14,7 +14,7 @@ class Login extends Component {
         };
     }
 
-    StudentHandler = (e) => {
+    LoginHandler = (e) => {
         var data = {
             name: this.state.name,
             pass: this.state.pass,
@@ -23,11 +23,11 @@ class Login extends Component {
         axios.post('http://localhost:3302/login', data)
             .then(res => {
                 console.log(res.data);
-                if (res.data = this.state.name) {
-                    alert('WELCOME To READERS CORNER');
+                if (res.data.name == this.state.name) {
+                    localStorage.setItem("usertype", "loggedin")
+                    localStorage.setItem("token", res.data.token)
+                    alert('WELCOME To READERS CORNER')
                     this.setState({redirect: true});
-
-
 
                 }
                 else{
@@ -68,25 +68,31 @@ class Login extends Component {
                         Password
                         <Input
                             inputSize="inputSall"
-                            type="text"
+                            type="password"
                             value={this.state.pass}
                             changed={e => this.setState({pass: e.target.value})}
                         />
                     </div>
-                    <button class="button button5" onClick={this.StudentHandler}>LOGIN</button>
+                    <button class="button button5" onClick={this.LoginHandler}>LOGIN</button>
                 </div>
                 <div className="description">
                     <div className="std">ABOUT </div>
                     <p className="about"> Welcome to Readers Corner.
                         <br/>
                         Login and review books you have read.
-                        Add new books and get others' opinion. Get insights with reviews  on differet books. Get started now!!!!!!!!!!</p>
+                        Add new books and get others' opinion. Get insights with reviews  on different books.
+                        If you are not a user, signup first.
+                        Get started now!!!!!!!!!!</p>
+
+
+
+            </div>
 
                 </div>
 
 
-                }
-            </div>
+
+
         )
     }
 }

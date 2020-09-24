@@ -2,10 +2,6 @@
  import axios from 'axios';
  import './App.css';
  import Input from './component/input/input';
-
-
-
-
  class Form extends Component{
      constructor(props){
          super();
@@ -28,13 +24,11 @@
          axios.post('http://localhost:3302/addbook',data)
              .then(res => {
                  console.log(res.data);
-                 if (res.data="Book Already in the Stack please review there"){
+                 if (res.data=="Book Already in the Stack please review there"){
                      alert("Book is already in stack please review  there")
                  }
                  else {
-                     this.props.history.push('/add-book')
-                     window.location.reload();
-                     alert(' New Book' + ' ' + this.state.Title + ' ' + 'added');
+                     this.props.history.push('/home')
                  }
              })
              // .catch((error) => {
@@ -47,10 +41,8 @@
          return (
              <div className="App body an">
                  <div className="an">
-                     <div className="left an">
                          <h1 className="Header an">ADD BOOK</h1>
 
-                         <div>
                              <Input
                                  inputSize="inputSmall"
                                  type="text"
@@ -58,8 +50,6 @@
                                  value={this.state.Title}
                                  changed={e=>this.setState({Title:e.target.value})}
                              />
-                         </div>
-                         <div>
                              <Input
                                  inputSize="inputSmall"
                                  type="text"
@@ -68,19 +58,6 @@
                                  changed={e => this.setState({ Author: e.target.value })}
                              />
 
-                         </div>
-                         <div>
-                             <Input
-                                 inputSize="inputSmall"
-                                 type="text"
-                                 placeholder='Review'
-                                 value={this.state.Review}
-                                 changed={e => this.setState({ Review: e.target.value })}
-                             />
-
-                         </div>
-
-
 
                          <br/>
                          <br/>
@@ -88,7 +65,6 @@
                      </div>
 
                  </div>
-             </div>
 
 
          );

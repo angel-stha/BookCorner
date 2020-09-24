@@ -15,19 +15,19 @@
 }
 
 .search div:nth-of-type(1){
-    width:140px;
+    width:150px;
 }
 .search div:nth-of-type(2){
-    width:200px;
-}
-.search div:nth-of-type(3){
-    width:500px;
-}
-.search div:nth-of-type(4){
     width:300px;
 }
+.search div:nth-of-type(3){
+    width:350px;
+}
+.search div:nth-of-type(4){
+    width:200px;
+}
 .search div:nth-of-type(5){
-    width:400px;
+    width:200px;
 }
 .search div:nth-of-type(6){
     width:100px;
@@ -42,7 +42,7 @@
     padding-top: 150px;
 }
 .shift {
-   padding-left: 1100px;
+    padding-left: 1100px;
 
 }
 .book{
@@ -63,12 +63,8 @@
     cursor: pointer;
     height: 50px;
 }
-.right{
-    float:left;
-}
-.left{
-    bottom:0;
+.left {
+   position: fixed;
+    top: 0;
     right:0;
-
-    padding-top: 500px;
 }

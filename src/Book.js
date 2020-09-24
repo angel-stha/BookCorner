@@ -1,7 +1,8 @@
 import React,{Component} from 'react';
 import axios from 'axios';
 import './Homepage.css';
-import Input from './component/input/input'
+import Input from './component/input/input';
+import { Redirect } from 'react-router';
 
 class Books extends Component{
     constructor(props) {
@@ -17,17 +18,19 @@ class Books extends Component{
         };
 
     }
+
+
     AddReview=(title, author,comment,date)=>{
-        console.log("Title and barcode is", title);
         var data={
             Review:comment,
             Title:title,
             Author:author,
             Date:date,
         }
-        if (comment=" "){
+        if (comment ==" "){
             alert("Empty review!! not valid")
-            window.location.reload();
+            this.props.history.push('/book');
+
         }
         else {
             axios.post('http://localhost:3302/addReview', data)
@@ -36,7 +39,7 @@ class Books extends Component{
                     console.log(res.data);
                     if (res.data == 'Comment Added') {
                         alert('Review added on' + ' ' + 'book' + ' ' + title);
-                        window.location.reload();
+                        this.props.history.push('/book');
                     }
                 })
                 .catch((error) => {
@@ -61,6 +64,7 @@ class Books extends Component{
 
     };
 
+
     componentDidMount(){
         axios.get("http://localhost:3302/getbook")
             .then(res=>{
@@ -76,7 +80,10 @@ class Books extends Component{
 
     }
     onChange = date => this.setState({ date })
-    render(){
+    render(
+
+    ){
+
 
         return(
             <div>
@@ -137,9 +144,6 @@ class Books extends Component{
                     })}
                 </div>
                 }
-                <div className="book">
-                    <button className="button" onClick={this.AddBook}>ADD BOOK</button>
-                    </div>
 
             </div>
 
