@@ -4,12 +4,13 @@ const bodyparser =require('body-parser');
 const cors = require('cors');
 var app = express();
 var jwt = require("jsonwebtoken");
+const path = require('path');
 
 app.use(cors())
 //Configuring express server
 app.use(bodyparser.urlencoded({ extended: false }));
 app.use(bodyparser.json());
-
+app.use(express.static(path.join(__dirname, 'public')))
 
 
 //MYSQl connection and details
