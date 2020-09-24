@@ -19,7 +19,7 @@ class UserProfile extends Component{
         var data={
             To:whom,
         }
-            axios.post('http://localhost:3302/addPing', data)
+            axios.post('http://54.165.178.5:3302/addPing', data)
                 .then(res => {
                     console.log(res.data);
                     if (res.data == 'Pinged') {
@@ -35,7 +35,7 @@ class UserProfile extends Component{
 
 
     componentDidMount(){
-        axios.get("http://localhost:3302/getusers")
+        axios.get("http://54.165.178.5:3302/getusers")
             .then(res=>{
 
 

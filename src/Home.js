@@ -28,7 +28,7 @@ class Home extends Component {
         };
         console.log(this.state.Search);
         axios
-            .get("http://localhost:3302/searchbooks", {
+            .get("http://54.165.178.5:3302/searchbooks", {
                 params: {
                     search: this.state.Search
                 }
@@ -46,7 +46,7 @@ class Home extends Component {
     };
     viewComment=(title, author)=>{
         axios
-            .get("http://localhost:3302/viewComment", {
+            .get("http://54.165.178.5:3302/viewComment", {
                 params: {
                     Title:title,
                     Author:author
@@ -63,7 +63,7 @@ class Home extends Component {
     };
 
     componentDidMount() {
-        axios.get("http://localhost:3302/pingedme")
+        axios.get("http://54.165.178.5:3302/pingedme")
 
             .then(res=>{
                 console.log(res.data);

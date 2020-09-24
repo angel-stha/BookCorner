@@ -26,7 +26,7 @@ class MyProfile extends Component{
             Title: title,
             Date: date,
         }
-            axios.post('http://localhost:3302/DeleteReview', data)
+            axios.post('http://54.165.178.5:3302/DeleteReview', data)
                 .then(res => {
                     if (res.data == 'Review Deleted') {
                         alert('Review deleted on' + ' '  + title);
@@ -46,7 +46,7 @@ class MyProfile extends Component{
         date: date,
     }
          axios
-            .post("http://localhost:3302/EditReview", data)
+            .post("http://54.165.178.5:3302/EditReview", data)
 
             .then(res => {
                 if (res.data == 'Review Edited')
@@ -68,14 +68,14 @@ class MyProfile extends Component{
 
     componentDidMount() {
 
-        axios.post("http://localhost:3302/getmydata",)
+        axios.post("http://54.165.178.5:3302/getmydata",)
             .then(res => {
                 console.log(res.data);
                 console.log("Nirva")
                 this.setState({items: res.data});
                 console.log(this.state.items);
             })
-        axios.get("http://localhost:3302/getrevieweddata")
+        axios.get("http://54.165.178.5:3302/getrevieweddata")
 
             .then(res=>{
                 console.log(res.data);
@@ -83,7 +83,7 @@ class MyProfile extends Component{
 
             })
 
-    axios.get("http://localhost:3302/ipinged")
+    axios.get("http://54.165.178.5:3302ipinged")
 
          .then(res=>{
                console.log(res.data);
